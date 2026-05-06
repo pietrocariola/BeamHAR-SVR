@@ -2,6 +2,7 @@
 
 STAS=(
   "192.168.1.3"
+  "192.168.1.4"
 )
 
 RATE_PER_STA="10M"   # start low; increase later
