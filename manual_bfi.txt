@@ -17,4 +17,7 @@ sudo airmon-ng stop wlp8s0
 -filtro para achar pacotes com bfi:
 wlan.vht.mimo_control.feedbacktype
 
+ntp clock app: atomic time ntp clock sync
+
+disable 6G: disable-ax wireless setup advanced
 

@@ -1,0 +1,11 @@
+label
+subject
+ambient
+number os stations
+stations' mac addresses
+number of videos
+wifi (AC or AX)
+users (SU or MU)
+antennas (4x1)
+bandwidth (80MHz)
+
