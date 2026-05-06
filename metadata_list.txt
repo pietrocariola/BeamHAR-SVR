@@ -2,7 +2,7 @@ label
 subject
 ambient
 number os stations
-stations' mac addresses
+stations' mac address
 number of videos
 wifi (AC or AX)
 users (SU or MU)
