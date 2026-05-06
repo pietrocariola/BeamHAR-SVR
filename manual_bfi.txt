@@ -1,0 +1,20 @@
+-fazer um diretorio para o pcap:
+mkdir captures
+cd captures
+chmod u+w .
+
+-inciar a captura/modo monitor:
+wpa_passphrase "NETGEAR93-5G" "shinycream130" > config
+sudo wpa_supplicant -B -i wlp8s0 -c config
+sudo dhclient wlp8s0
+sudo airmon-ng start wlp8s0
+sudo iw dev wlp8s0 set channel 44 80MHz
+sudo tshark -i wlp8s0 -w capture.pcapng
+
+-voltar para o modo normal:
+sudo airmon-ng stop wlp8s0
+
+-filtro para achar pacotes com bfi:
+wlan.vht.mimo_control.feedbacktype
+
+
