@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 
 # add servers here
-SERVERS=("192.168.1.4" "192.168.1.5")
-BITRATES=("10M" "10M")
-LENGTHS=("1400" "1400")
-PROTOCOLS=("UDP" "TCP") 
+SERVERS=("192.168.1.8" "192.168.1.7" "192.168.1.11")  
+BITRATES=("10M" "10M" "10M")
+LENGTHS=("1200" "1200" "1200")
+PROTOCOLS=("UDP" "UDP" "UDP") 
 
 # clean up group processes (and childs) when Ctrl+C
 cleanup() {

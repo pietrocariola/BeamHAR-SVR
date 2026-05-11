@@ -1,0 +1,9 @@
+9a:f1:01:ba:a2:f5 # .8 g73
+7a:4b:45:12:ea:9b # .5 003 ultra
+9e:69:8f:0e:5c:ab # .12 004 ultra
+
+9a:f1:01:ba:a2:f5 # .8 g73
+02:c6:ff:32:c3:d1 # .7 g53 neo
+4a:96:88:20:fe:50 # .11
+# 004 ultra (video), 003 ultra (video)
+
