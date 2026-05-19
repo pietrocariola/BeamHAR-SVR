@@ -1,9 +1,17 @@
+nao deu certo
 9a:f1:01:ba:a2:f5 # .8 g73
 7a:4b:45:12:ea:9b # .5 003 ultra
 9e:69:8f:0e:5c:ab # .12 004 ultra
 
+gravamos assim augusto e viviani
 9a:f1:01:ba:a2:f5 # .8 g73
 02:c6:ff:32:c3:d1 # .7 g53 neo
-4a:96:88:20:fe:50 # .11
+4a:96:88:20:fe:50 # .11 g35
+# 004 ultra (video), 003 ultra (video)
+
+gravamos assim pietro
+9a:f1:01:ba:a2:f5 # .8 g73
+02:c6:ff:32:c3:d1 # .7 g53 neo
+36:0e:9d:f9:2d:b7 # .4 z fold 4
 # 004 ultra (video), 003 ultra (video)
 
