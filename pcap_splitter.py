@@ -1,104 +1,89 @@
-PCAP = "./test_captures/capture_andando.pcapng"
-LABELS = ['sat', 'stand']
-SUBJECTS = ['pietro', 'augusto']
-START_TIMES = ["2026-04-27 16:15:49,106", "2026-04-27 16:15:59,000"]
-END_TIMES = ["2026-04-27 16:15:59,000", "2026-04-27 16:19:00,000"]
-SERVERS = [
-#   [AC/AX, SU/MU, ATENNAS, BANDWIDTH, MAC]
-    ['AC', 'SU', '4x1', '80', "02:c6:ff:32:c3:d1"],
-    ['AC', 'SU', '4x1', '80', "02:c6:ff:32:c3:d1"]
-]
 WIBFI = "./wibfi/main.py"
 
 import subprocess
-# import pyshark
 import os
 import sys
-# import re
+import argparse
+import csv
 
-wibfi = os.path.abspath(WIBFI)
+if __name__=='__main__':
 
-for i in range(len(LABELS)): 
+    # Create a command-line argument parser
+    parser = argparse.ArgumentParser()
 
-    print(f"Label: {LABELS[i]}")
+    # Define command-line arguments
+    parser.add_argument('scenario', help='hall, lab, ...')
+    parser.add_argument('person', help='P01, P02, P03, ...')
+    parser.add_argument('session', help='S01, S02, S03, ...')    
 
-    for j, server in enumerate(SERVERS):
+    # Parse the command-line arguments
+    args = parser.parse_args()
 
-        print(f"Server: {server}")
+    # Set variables based on command-line arguments
+    scenario = args.scenario
+    person = args.person
+    session = args.session
 
-        file_name = LABELS[i]+"_"+ \
-        SUBJECTS[i]+"_"+ \
-        START_TIMES[i].split(",")[0].replace("-", "").replace(" ","").replace(":", "") + \
-        START_TIMES[i].split(",")[1][:3] + "_" + \
-        END_TIMES[i].split(",")[0].replace("-", "").replace(" ","").replace(":", "") + \
-        END_TIMES[i].split(",")[1][:3] + \
-        server[4][:5].replace(":", "")
+    wibfi = os.path.abspath(WIBFI)
 
-        # new_pcap = file_name + ".pcapng"
+    labels = os.path.abspath('./BeamHAR-SVR-Data/scenarios/'+scenario.lower()+'/'+person.upper()+'/'+session.upper()+'/annotations/activity_segments.csv')
+    devices = os.path.abspath('./BeamHAR-SVR-Data/scenarios/'+scenario.lower()+'/'+person.upper()+'/'+session.upper()+'/annotations/devices.csv')
+    pcap = os.path.abspath(devices+'/../../raw/capture.pcapng')
+    outputs = os.path.abspath(devices+'/../../processed/')
 
-        cmd = [
-            'tshark',
-            '-r', PCAP,
-            '-Y', 'frame.time >= "'+START_TIMES[i]+'" && \
-                    frame.time <= "'+END_TIMES[i]+'" && \
-                    wlan.vht.compressed_beamforming_report && \
-                    wlan.addr=='+server[4]
-        ]
+    with open(labels, 'r') as file_labels:
+        reader_labels = csv.DictReader(file_labels)
+        # next(reader_labels)
 
-        result = subprocess.run(cmd, capture_output=True, text=True)
-        n_pkts = len(result.stdout.strip().split('\n'))
-        print(f"n_pkts: {n_pkts}")
+        with open(devices, 'r') as file_devices:
+            reader_devices = csv.DictReader(file_devices)
+            # next(reader_devices)
 
-        # pcap = pyshark.FileCapture(
-        #     './test_captures/'+new_pcap,
-        #     keep_packets=False,
-        #     use_json=True
-        # )   
+            for i, label in enumerate(reader_labels):
+                print(f"Label {i}")
+                file_devices.seek(0)
+                reader_devices = csv.DictReader(file_devices)
+                for j, device in enumerate(reader_devices):
+                    print(f"Device {j}")
 
-        # print("counting pkts:")
-        # n_packets = 0
-        # for _ in pcap:
-        #     print(f"'\r'{n_packets}", end="")
-        #     n_packets += 1
-        # print(f"\r{n_packets}", end="")
-        # print("")
+                    cmd = [
+                        'tshark',
+                        '-r', pcap,
+                        '-Y', 'frame.time >= "'+label['start_time']+'" && \
+                                frame.time <= "'+label['end_time']+'" && \
+                                wlan.vht.compressed_beamforming_report && \
+                                wlan.addr=='+device['mac']
+                    ]
 
-        # del(pcap)
+                    result = subprocess.run(cmd, capture_output=True, text=True)
+                    n_pkts = len(result.stdout.strip().split('\n'))
+                    print(f"n_pkts: {n_pkts}")
 
-        # result = subprocess.run(
-        #     ["capinfos", f"./test_captures/{new_pcap}"],
-        #     capture_output=True,
-        #     text=True
-        # )
+                    file_name = f"label{i}_{device['device']}"
+                    file_name = os.path.abspath(os.path.join(outputs,file_name))
+                    timestamp = f"{file_name}_timestamp" 
+                    v = f"{file_name}_v" 
+                    bfa = f"{file_name}_bfa"
 
-        # match = re.search(r"Number of packets:\s+(\d+)", result.stdout)
+                    print(device['standard'])
+                    print(device['mimo'])
+                    print(device['antennas'])
+                    print(device['bandwidth'])
+                    print(device['mac'])
 
-        # if match:
-        #     n_packets = int(match.group(1))
-        #     print(n_packets)
-        # else:
-        #     print(f"Error: number of packets not found in capinfos")     
-
-        timestamp = f"{file_name}_timestamp" 
-        v = f"{file_name}_v" 
-        bfa = f"{file_name}_bfa"
-        print(f"TIMESTAMP:{timestamp}")
-        print(f"V:{v}")
-        print(f"BFA:{bfa}")        
-
-        cmd = [
-            sys.executable,
-            wibfi,
-            PCAP,
-            server[0],
-            server[1],
-            server[2],
-            server[3],
-            server[4],
-            str(n_pkts),
-            timestamp,
-            v,
-            bfa
-        ]
-        result = subprocess.run(cmd, capture_output=True, text=True)
-        print(result)
+                    cmd = [
+                        sys.executable,
+                        wibfi,
+                        pcap,
+                        device['standard'],
+                        device['mimo'],
+                        device['antennas'],
+                        device['bandwidth'],
+                        device['mac'],
+                        str(n_pkts),
+                        timestamp,
+                        v,
+                        bfa
+                    ]
+                    result = subprocess.run(cmd, capture_output=True, text=True)
+                    
