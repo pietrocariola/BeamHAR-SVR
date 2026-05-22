@@ -5,18 +5,18 @@ START_TIMES = ["2026-04-27 16:15:49,106", "2026-04-27 16:15:59,000"]
 END_TIMES = ["2026-04-27 16:15:59,000", "2026-04-27 16:19:00,000"]
 SERVERS = [
 #   [AC/AX, SU/MU, ATENNAS, BANDWIDTH, MAC]
-    ['AC', 'SU', '4x1', '80', '02:c6:ff:32:c3:d1'],
-    ['AC', 'SU', '4x1', '80', '02:c6:ff:32:c3:d1']
+    ['AC', 'SU', '4x1', '80', "02:c6:ff:32:c3:d1"],
+    ['AC', 'SU', '4x1', '80', "02:c6:ff:32:c3:d1"]
 ]
-WI_BFI = "~/Wi-BFI/main.py"
+WIBFI = "./wibfi/main.py"
 
 import subprocess
 # import pyshark
 import os
-# import sys
+import sys
 # import re
 
-wi_bfi = os.path.expanduser(WI_BFI)
+wibfi = os.path.abspath(WIBFI)
 
 for i in range(len(LABELS)): 
 
@@ -34,16 +34,20 @@ for i in range(len(LABELS)):
         END_TIMES[i].split(",")[1][:3] + \
         server[4][:5].replace(":", "")
 
-        new_pcap = file_name + ".pcapng"
+        # new_pcap = file_name + ".pcapng"
 
         cmd = [
             'tshark',
             '-r', PCAP,
-            '-Y', 'frame.time >= "'+START_TIMES[i]+'" && frame.time <= "'+END_TIMES[i]+'" && wlan.sa == '+server[4],
-            '-w', './test_captures/'+new_pcap
+            '-Y', 'frame.time >= "'+START_TIMES[i]+'" && \
+                    frame.time <= "'+END_TIMES[i]+'" && \
+                    wlan.vht.compressed_beamforming_report && \
+                    wlan.addr=='+server[4]
         ]
+
         result = subprocess.run(cmd, capture_output=True, text=True)
-        print(result)
+        n_pkts = len(result.stdout.strip().split('\n'))
+        print(f"n_pkts: {n_pkts}")
 
         # pcap = pyshark.FileCapture(
         #     './test_captures/'+new_pcap,
@@ -75,23 +79,26 @@ for i in range(len(LABELS)):
         # else:
         #     print(f"Error: number of packets not found in capinfos")     
 
-        # v = f"{file_name}_v" 
-        # bfa = f"{file_name}_bfa"
-        # print(f"V:{v}")
-        # print(f"BFA:{bfa}")        
+        timestamp = f"{file_name}_timestamp" 
+        v = f"{file_name}_v" 
+        bfa = f"{file_name}_bfa"
+        print(f"TIMESTAMP:{timestamp}")
+        print(f"V:{v}")
+        print(f"BFA:{bfa}")        
 
-        # cmd = [
-        #     sys.executable,
-        #     wi_bfi,
-        #     './test_captures/'+new_pcap,
-        #     server[0],
-        #     server[1],
-        #     server[2],
-        #     server[3],
-        #     server[4],
-        #     str(n_packets-18),
-        #     v,
-        #     bfa
-        # ]
-        # result = subprocess.run(cmd, capture_output=True, text=True)
-        # print(result)
+        cmd = [
+            sys.executable,
+            wibfi,
+            PCAP,
+            server[0],
+            server[1],
+            server[2],
+            server[3],
+            server[4],
+            str(n_pkts),
+            timestamp,
+            v,
+            bfa
+        ]
+        result = subprocess.run(cmd, capture_output=True, text=True)
+        print(result)
