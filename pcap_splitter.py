@@ -20,9 +20,9 @@ if __name__=='__main__':
     args = parser.parse_args()
 
     # Set variables based on command-line arguments
-    scenario = args.scenario
-    person = args.person
-    session = args.session
+    scenario = args.scenario.lower()
+    person = args.person.lower()
+    session = args.session.lower()
 
     wibfi = os.path.abspath(WIBFI)
 
@@ -59,7 +59,7 @@ if __name__=='__main__':
                     n_pkts = len(result.stdout.strip().split('\n'))
                     print(f"n_pkts: {n_pkts}")
 
-                    file_name = f"label{i}_{device['device']}"
+                    file_name = f"{label['label'].lower()}_{device['device'].lower()}_{label['start_time'].replace(" ", "-")}"
                     file_name = os.path.abspath(os.path.join(outputs,file_name))
                     timestamp = f"{file_name}_timestamp" 
                     v = f"{file_name}_v" 
