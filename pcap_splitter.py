@@ -74,7 +74,7 @@ if __name__=='__main__':
                 file_labels.seek(0)
                 reader_labels = csv.DictReader(file_labels)
                 for label in reader_labels:
-                    label = label.replace("/", " ")
+                    label['label'] = label['label'].replace("/", " ")
                     pcap_timestamp = os.path.join(captures, 'capture_timestamp.pcapng')
                     sys.stdout.write("\033[2K\r")
                     print(f"Label ({label['label'].lower()},{label['person'].lower()})...", end="\r")
