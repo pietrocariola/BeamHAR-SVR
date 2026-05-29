@@ -1,1 +1,0 @@
-sudo tshark -r capture_parado.pcapng -Y "wlan.sa == 02:c6:ff:32:c3:d1" -T fields -e wlan.vht.mimo_control.feedbacktype -e wlan.vht.compressed_beamforming_report -e frame.time_epoch -n | python3 captures.py

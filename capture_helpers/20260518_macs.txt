@@ -1,5 +1,0 @@
-gravamos os 3
-4a:96:88:20:fe:50 # .4 g35
-9a:f1:01:ba:a2:f5 # .5 g73
-02:c6:ff:32:c3:d1 # .2 g53
-# 004 ultra (video), 003 ultra (video)
