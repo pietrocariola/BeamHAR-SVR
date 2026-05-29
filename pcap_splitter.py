@@ -6,6 +6,12 @@ import sys
 import argparse
 import csv
 
+def remove_file(file_path):
+    if os.path.exists(file_path):
+        os.remove(file_path)
+    else:
+        print(f"WARNING: {file_path.split("/")[-1]} does not exist")
+
 if __name__=='__main__':
 
     # Create a command-line argument parser
@@ -24,66 +30,79 @@ if __name__=='__main__':
     person = args.person.lower()
     session = args.session.lower()
 
+    print(f"{scenario} | {person} | {session}")
+
     wibfi = os.path.abspath(WIBFI)
 
-    labels = os.path.abspath('./BeamHAR-SVR-Data/scenarios/'+scenario.lower()+'/'+person.upper()+'/'+session.upper()+'/annotations/activity_segments.csv')
-    devices = os.path.abspath('./BeamHAR-SVR-Data/scenarios/'+scenario.lower()+'/'+person.upper()+'/'+session.upper()+'/annotations/devices.csv')
-    pcap = os.path.abspath(devices+'/../../raw/capture.pcapng')
-    outputs = os.path.abspath(devices+'/../../processed/')
+    labels = os.path.abspath('./BeamHAR-SVR-Data/scenarios/'+scenario+'/'+person+ \
+                             '/'+session+'/annotations/activity_segments.csv')
+    devices = os.path.abspath('./BeamHAR-SVR-Data/scenarios/'+scenario+'/'+person+ \
+                              '/'+session+'/annotations/devices.csv')
+    captures = os.path.abspath('./BeamHAR-SVR-Data/scenarios/'+scenario+'/'+person+ \
+                              '/'+session+'/raw/')
+    outputs = os.path.abspath('./BeamHAR-SVR-Data/scenarios/'+scenario+'/'+person+ \
+                              '/'+session+'/processed/')
+
+    pcap = os.path.join(captures, 'capture.pcapng')
+    pcap_mimo = os.path.join(captures, 'capture_mimo.pcapng')
+
+    print(f"Filtering mimo control packets...")
+    cmd = [
+        'tshark',
+        '-r', pcap,
+        '-Y', 'wlan.vht.mimo_control.feedbacktype',
+        '-w', pcap_mimo
+    ]
+    result = subprocess.run(cmd, capture_output=True, text=True)
 
     with open(labels, 'r') as file_labels:
         reader_labels = csv.DictReader(file_labels)
-        # next(reader_labels)
 
         with open(devices, 'r') as file_devices:
             reader_devices = csv.DictReader(file_devices)
-            # next(reader_devices)
 
-            for i, label in enumerate(reader_labels):
-                print(f"Label {i}")
-                file_devices.seek(0)
-                reader_devices = csv.DictReader(file_devices)
-                for j, device in enumerate(reader_devices):
-                    print(f"Device {j}")
-
+            for device in reader_devices:
+                pcap_device = os.path.join(captures, 'capture_device.pcapng')
+                print(f"Filtering device {device['device'].lower()}...")
+                cmd = [
+                    'tshark',
+                    '-r', pcap_mimo,
+                    '-Y', f"wlan.addr=={device['mac']}",
+                    '-w', pcap_device
+                ]
+                result = subprocess.run(cmd, capture_output=True, text=True)
+                file_labels.seek(0)
+                reader_labels = csv.DictReader(file_labels)
+                for label in reader_labels:
+                    pcap_timestamp = os.path.join(captures, 'capture_timestamp.pcapng')
+                    sys.stdout.write("\033[2K\r")
+                    print(f"Label ({label['label'].lower()},{label['person'].lower()})...", end="\r")
                     cmd = [
                         'tshark',
-                        '-r', pcap,
-                        '-Y', 'frame.time >= "'+label['start_time']+'" && \
-                                frame.time <= "'+label['end_time']+'" && \
-                                wlan.vht.compressed_beamforming_report && \
-                                wlan.addr=='+device['mac']
+                        '-r', pcap_device,
+                        '-Y', 'frame.time >= "%s" && frame.time <= "%s"' % (label['start_time'], label['end_time']),
+                        '-w', pcap_timestamp
                     ]
-
                     result = subprocess.run(cmd, capture_output=True, text=True)
-                    n_pkts = len(result.stdout.strip().split('\n'))
-                    print(f"n_pkts: {n_pkts}")
-
-                    file_name = f"{label['label'].lower()}_{device['device'].lower()}_{label['start_time'].replace(" ", "-")}"
-                    file_name = os.path.abspath(os.path.join(outputs,file_name))
+                    file_name = f"{label['label'].lower()}_{label['person'].lower()}_{ \
+                        device['device'].lower()}_{label['start_time'].replace(" ", "-").replace(":", "-")}"
+                    file_name = os.path.abspath(os.path.join(outputs, file_name))
                     timestamp = f"{file_name}_timestamp" 
                     v = f"{file_name}_v" 
                     bfa = f"{file_name}_bfa"
-
-                    print(device['standard'])
-                    print(device['mimo'])
-                    print(device['antennas'])
-                    print(device['bandwidth'])
-                    print(device['mac'])
-
                     cmd = [
                         sys.executable,
                         wibfi,
-                        pcap,
+                        pcap_timestamp,
                         device['standard'],
-                        device['mimo'],
                         device['antennas'],
                         device['bandwidth'],
                         device['mac'],
-                        str(n_pkts),
                         timestamp,
                         v,
                         bfa
                     ]
                     result = subprocess.run(cmd, capture_output=True, text=True)
-                    
+                    remove_file(pcap_timestamp)
+                remove_file(pcap_device)
+    remove_file(pcap_mimo)
