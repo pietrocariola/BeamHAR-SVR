@@ -1,0 +1,8 @@
+{
+    "test_split_pct": 0.1,
+    "val_split_pct": 0.1,
+    "window_size": 10,
+    "seed": 0,
+    "file_type": "bfa",
+    "stations": ["sta03"]
+}

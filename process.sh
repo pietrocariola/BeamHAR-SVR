@@ -8,7 +8,7 @@ sessions=("s01")
 for scenario in "${scenarios[@]}"; do
     for person in "${persons[@]}"; do
         for session in "${sessions[@]}"; do
-            python pcap_splitter.py "$scenario" "$person" "$session"
+            python process.py "$scenario" "$person" "$session"
         done
     done
 done

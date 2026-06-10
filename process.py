@@ -50,7 +50,7 @@ if __name__=='__main__':
     cmd = [
         'tshark',
         '-r', pcap,
-        '-Y', 'wlan.vht.mimo_control.feedbacktype',
+        '-Y', 'wlan.vht.mimo_control.feedbacktype && wlan.vht.mimo_control.feedbacktype == MU',
         '-w', pcap_mimo
     ]
     result = subprocess.run(cmd, capture_output=True, text=True)

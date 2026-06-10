@@ -1,14 +1,16 @@
 import numpy as np
 from pathlib import Path
 import random
-
-TEST_SPLIT = 0.10
-WINDOW_SIZE = 4
-SEED = 0
+import json
 
 if __name__=='__main__':
 
-    random.seed(SEED)
+    config = json.load(open('config.json', 'r'))   
+    file_type = config['file_type'].lower()
+    window_size = config['window_size']
+    val_split_pct = config['val_split_pct']
+    test_split_pct = config['test_split_pct']
+    random.seed(config['seed'])
 
     path = Path("./BeamHAR-SVR-Data/scenarios")
     
@@ -16,32 +18,51 @@ if __name__=='__main__':
     train.mkdir(exist_ok=True)
     print(f"Train folder created: ok")
 
+    val = Path("./BeamHAR-SVR-Data/val")
+    val.mkdir(exist_ok=True)
+    print(f"Validation folder created: ok")
+
     test = Path("./BeamHAR-SVR-Data/test")
     test.mkdir(exist_ok=True)
     print(f"Test folder created: ok")
 
-    files = path.rglob("*_v.npy")
+    files = path.rglob(f"*_{file_type}.npy")
     labels = [file.name.split("_")[0] for file in files]
-    labels = list(set(labels))
+    labels = list(set(labels)).sort()
 
     for label in labels:
         Path(f"./BeamHAR-SVR-Data/train/{label}").mkdir(exist_ok=True)
+        Path(f"./BeamHAR-SVR-Data/val/{label}").mkdir(exist_ok=True)
         Path(f"./BeamHAR-SVR-Data/test/{label}").mkdir(exist_ok=True)
     print(f"Label folders created: ok")
 
-    files = path.rglob("*_v.npy")
+    label_dict = {}
+    for i, label in enumerate(labels):
+        label_dict[label] = i
+    with open('label_dict.json', 'w') as f:
+        json.dump(label_dict, f, indent=4)
+    print(f"Label dict created: ok")
+
+    files = path.rglob(f"*_{file_type}.npy")
     for i, file in enumerate(files):
         print(f"Processing file {i}", end="\r")
         x = np.load(file, 'r')
-        n_windows = x.shape[0] // WINDOW_SIZE
+        n_windows = int(x.shape[0] // window_size)
         for j in range(n_windows):
-            x = x[j*WINDOW_SIZE:(j+1)*WINDOW_SIZE, :, :, :]
+            if file_type == 'bfa':
+                y = x[j*window_size:(j+1)*window_size, :, :]
+            elif file_type == 'v':
+                y = x[j*window_size:(j+1)*window_size, :, :, :]
             label = file.name.split("_")[0]
             file_name = file.name.split("/")[-1].split(".")[0]+"_"+str(j).zfill(6)+".npy"
-            if random.uniform(0, 1) <= TEST_SPLIT:
+            if random.uniform(0, 1) <= test_split_pct:
                 p = Path("./BeamHAR-SVR-Data/test/") / label / file_name
-                np.save(p, x)
+                np.save(p, y)
             else:
-                p = Path("./BeamHAR-SVR-Data/train/") / label / file_name
-                np.save(p, x)
+                if random.uniform(0, 1) <= val_split_pct:
+                    p = Path("./BeamHAR-SVR-Data/val/") / label / file_name
+                    np.save(p, y)
+                else:
+                    p = Path("./BeamHAR-SVR-Data/train/") / label / file_name
+                    np.save(p, y)
     print("Files processing: ok")
