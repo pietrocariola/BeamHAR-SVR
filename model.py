@@ -1,4 +1,4 @@
-from tensorflow.keras import layers, models
+from keras import layers, models
 
 def getModel(window_size=10, classes=7):
     model = models.Sequential()
@@ -12,20 +12,20 @@ def getModel(window_size=10, classes=7):
         )
     )
     model.add(layers.Conv2D(128, (3, 3), activation="relu", padding="same"))
-    model.add(layers.BatchNormalization())
-    model.add(layers.Activation("relu"))
+    # model.add(layers.BatchNormalization())
+    # model.add(layers.Activation("relu"))
 
     model.add(layers.Conv2D(64, (3, 3), activation="relu", padding="same"))
     model.add(layers.Conv2D(64, (3, 3), activation="relu", padding="same"))
-    model.add(layers.BatchNormalization())
-    model.add(layers.Activation("relu"))
-    model.add(layers.MaxPooling2D(pool_size=(2, 1)))
+    # model.add(layers.BatchNormalization())
+    # model.add(layers.Activation("relu"))
+    model.add(layers.MaxPooling2D(pool_size=(2, 4)))
 
     model.add(layers.Conv2D(32, (3, 3), activation="relu", padding="same"))
     model.add(layers.Conv2D(32, (3, 3), activation="relu", padding="same"))
-    model.add(layers.BatchNormalization())
-    model.add(layers.Activation("relu"))
-    model.add(layers.MaxPooling2D(pool_size=(2, 1)))
+    # model.add(layers.BatchNormalization())
+    # model.add(layers.Activation("relu"))
+    model.add(layers.MaxPooling2D(pool_size=(2, 4)))
 
     model.add(layers.Flatten())
     model.add(layers.Dense(classes, activation="softmax"))

@@ -1,5 +1,5 @@
-from tensorflow import keras
-from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint, ReduceLROnPlateau
+import keras
+from keras.callbacks import EarlyStopping, ModelCheckpoint, ReduceLROnPlateau
 from model import getModel
 from dataset import MyDataset
 import json
@@ -9,16 +9,17 @@ def main():
     with open('config.json', 'r') as f:
         config = json.load(f)
 
+    keras.utils.set_random_seed(config['seed'])
     window_size = config['window_size']
     file_type = config['file_type'].lower()
-    station = config['stations'][0]
+    station = config['stations'][0].lower()
 
     with open('label_dict.json', 'r') as f:
         label_dict = json.load(f)
 
     classes = len(label_dict)
 
-    model = getModel(windows_size=window_size, classes=classes)
+    model = getModel(window_size=window_size, classes=classes)
 
     train_gen = MyDataset(file_type=file_type, station=station, ds_split='train')
     val_gen = MyDataset(file_type=file_type, station=station, ds_split='val')
@@ -44,12 +45,13 @@ def main():
         x=train_gen,
         epochs=100,
         validation_data=val_gen,
+        class_weight=train_gen.get_weights(),
         callbacks=[earlystopping, learning_rate_reduction, checkpoint],
         verbose=1,
     )
 
     with open('history.json', 'w') as f:
-        json.dump(history, f, indent=4)
+        json.dump(history.history, f, indent=4)
 
 if __name__=="__main__":
     main()

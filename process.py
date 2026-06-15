@@ -1,10 +1,10 @@
-WIBFI = "./wibfi/main.py"
-
 import subprocess
 import os
 import sys
 import argparse
 import csv
+
+WIBFI = "./wibfi/main.py"
 
 def remove_file(file_path):
     if os.path.exists(file_path):

@@ -11,6 +11,7 @@ if __name__=='__main__':
     val_split_pct = config['val_split_pct']
     test_split_pct = config['test_split_pct']
     random.seed(config['seed'])
+    np.random.seed(config['seed'])
 
     path = Path("./BeamHAR-SVR-Data/scenarios")
     
@@ -28,7 +29,8 @@ if __name__=='__main__':
 
     files = path.rglob(f"*_{file_type}.npy")
     labels = [file.name.split("_")[0] for file in files]
-    labels = list(set(labels)).sort()
+    labels = list(set(labels))
+    labels = sorted(labels)
 
     for label in labels:
         Path(f"./BeamHAR-SVR-Data/train/{label}").mkdir(exist_ok=True)
