@@ -7,20 +7,22 @@ import random
 DATA_PATH = "./BeamHAR-SVR-Data/"
 
 class MyDataset(keras.utils.Sequence):
-    def __init__(self, file_type, station, ds_split, batch_size=1):
+    def __init__(self, file_type, station, ds_split, batch_size=4):
         super().__init__()
-        self.paths_train = list(Path(DATA_PATH+'train').rglob(f"*{station}*{file_type}*.npy"))
-        self.paths = list(Path(DATA_PATH+ds_split).rglob(f"*{station}*{file_type}*.npy"))
-        print(f"File count for {ds_split} split: {len(self.paths)}")
-        self.batch_size = batch_size
         with open('label_dict.json', 'r') as f:
             self.label_dict = json.load(f)
+        self.paths = []
+        for k, _ in self.label_dict.items():
+            self.paths += list(Path(DATA_PATH+ds_split).rglob(f"{k}_*{station}*{file_type}*.npy"))
+        print(f"File count for {ds_split} split: {len(self.paths)}")
+        random.shuffle(self.paths)
+        self.batch_size = batch_size        
         
     def get_weights(self):
         weights = {}
         for k, v in self.label_dict.items():
             count = 0
-            for file in self.paths_train:
+            for file in self.paths:
                 if str(file).split("/")[-1].split("_")[0] == k:
                     count += 1
             weights[v] = 1/count if count != 0 else 0
@@ -44,6 +46,7 @@ class MyDataset(keras.utils.Sequence):
         x = np.vstack([x])
         labels = np.array(labels)
         labels = keras.utils.to_categorical(labels, num_classes=len(self.label_dict))
+        # x = np.transpose(x, axes=(0, 1, 3, 2))
         return x, labels
 
     def __len__(self):

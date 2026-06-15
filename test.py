@@ -31,14 +31,15 @@ def main():
     Y_true = []
     Y_pred = []
 
-    for x, y in test_gen:
+    for i in range(len(test_gen)):
+        x, y = test_gen[i]
         Y_true.append(np.argmax(y, axis=1))
         Y_pred.append(np.argmax(model.predict(x), axis=1))
 
     Y_true = np.concatenate(Y_true, axis=0)
     Y_pred = np.concatenate(Y_pred, axis=0)
 
-    cm = confusion_matrix(Y_true, Y_pred)
+    cm = confusion_matrix(Y_true, Y_pred, normalize='true')
 
     plt.figure(figsize=(24, 24))
     ax = sns.heatmap(

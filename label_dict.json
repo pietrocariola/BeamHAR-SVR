@@ -4,5 +4,6 @@
     "sitting": 2,
     "sitting down": 3,
     "standing up (from chair)": 4,
-    "standing up (from floor)": 5
+    "standing up (from floor)": 5,
+    "walking": 6
 }

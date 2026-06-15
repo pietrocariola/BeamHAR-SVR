@@ -1,6 +1,6 @@
 import keras
 from keras.callbacks import EarlyStopping, ModelCheckpoint, ReduceLROnPlateau
-from model import getModel
+from model_cnn import getModel
 from dataset import MyDataset
 import json
 
@@ -22,6 +22,7 @@ def main():
     model = getModel(window_size=window_size, classes=classes)
 
     train_gen = MyDataset(file_type=file_type, station=station, ds_split='train')
+    # train_gen.class_limiter()
     val_gen = MyDataset(file_type=file_type, station=station, ds_split='val')
 
     learning_rate_reduction = ReduceLROnPlateau(
@@ -45,7 +46,7 @@ def main():
         x=train_gen,
         epochs=100,
         validation_data=val_gen,
-        class_weight=train_gen.get_weights(),
+        # class_weight=train_gen.get_weights(),
         callbacks=[earlystopping, learning_rate_reduction, checkpoint],
         verbose=1,
     )
