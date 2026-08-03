@@ -8,7 +8,7 @@ cd BeamHAR-SVR
 
 Download the dataset from IEEE DataPort (inside BeamHAR-SVR/)
 
-Clone forked WIBFI repository:
+Clone forked WIBFI repository (inside BeamHAR-SVR/):
 ```bash
 git clone https://github.com/pietrocariola/wibfi.git
 ```
