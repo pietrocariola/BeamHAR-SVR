@@ -37,4 +37,4 @@ Start iperf3 on the other computer:
 ```bash
 ./iperf.sh
 ```
-changing server's settings (IP, bitrate, packet length, protocol) inside `iperf.sh` script. 
+changing server's settings and traffic configurations (IP, bitrate, packet length, protocol) inside `iperf.sh` script. 
