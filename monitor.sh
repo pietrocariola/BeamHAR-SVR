@@ -1,4 +1,4 @@
-wpa_passphrase "NETGEAR93-5G" "password" > config
+wpa_passphrase "network_name" "password" > config
 sudo wpa_supplicant -B -i wlp8s0 -c config
 sudo dhclient wlp8s0
 sudo airmon-ng start wlp8s0
