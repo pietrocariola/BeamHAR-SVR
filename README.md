@@ -25,7 +25,7 @@ Run on the monitor computer:
 ```bash
 ./monitor.sh
 ```
-changing `network_name` for the actual name of the network, `password` for the network password, and `wlp8s0` by the name of the network device in your computer (find the wireless device runing `ip a` on terminal).
+changing `network_name` for the actual name of the network, `password` for the network password, and `wlp8s0` by the name of the network device in your computer (find the wireless device by running `ip a` on terminal).
 
 To exit monitor mode (after finishing the experiment):
 ```bash
