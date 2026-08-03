@@ -37,4 +37,16 @@ Start iperf3 on the other computer:
 ```bash
 ./iperf.sh
 ```
-changing server's settings and traffic configurations (IP, bitrate, packet length, protocol) inside `iperf.sh` script. 
+changing server's settings and traffic configurations (IP, bitrate, packet length, protocol) inside `iperf.sh` script.
+
+On the server (mobile phone) side click on the top left menu button:
+
+<img src="./iperf_imgs/img1.jpeg" width="200">
+
+Click on `Server`:
+
+<img src="./iperf_imgs/img2.jpeg" width="200">
+
+Click on the bottom right `Run` button:
+
+<img src="./iperf_imgs/img3.jpeg" width="200">
