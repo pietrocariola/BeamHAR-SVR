@@ -19,7 +19,7 @@ To process data:
 ```
 adjusting the code in `process.sh` for the desired scenarios, persons, and sessions.
 
-# Scripts to reproduce the experiment
+# To reproduce the experiment
 
 Run on the monitor computer:
 ```bash
