@@ -50,3 +50,7 @@ Click on `Server`:
 Click on the bottom right `Run` button:
 
 <img src="./iperf_imgs/img3.jpeg" width="200">
+
+# BFI/BFA Dashboard
+
+Instructions for creating a dashboard from data are inside `generate_html.ipynb` notebook.
